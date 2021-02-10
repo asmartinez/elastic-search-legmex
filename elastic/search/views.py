@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import DocumentoSerializer
+from .models import Biblioteca
 from .documents import BibliotecaDocument
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -71,7 +72,7 @@ def BuscarDocumento(request):
     # Devuelve un error si no se manda ningun argumento
     else:
         return Response(
-            { 'message': 'Error, no se mando ningun argumento de busqueda'},
+            {"message": "Error, no se mando ningun argumento de busqueda"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -94,3 +95,37 @@ def BuscarDocumento(request):
         ]
 
     return Response(deSerializer.data, status=status.HTTP_200_OK)
+
+
+class ModificarDocumento(APIView):
+    """
+    Funcion para eliminar un documento por su id, en la url se puede meter este valor
+    """
+
+    def delete(self, request, id):
+        try:
+            documentByID = Biblioteca.objects.get(id=id)
+        except:
+            return Response(
+                {"message": "Error, no se encontro el documento"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        documentByID.delete()
+        return Response(
+            {"message": "Se elimino correctamente el documento"},
+            status=status.HTTP_200_OK,
+        )
+    def put(self, request, id):
+        try:
+            documentByID = Biblioteca.objects.get(id=id)
+        except:
+            return Response(
+                {"message": "Error, no se encontro el documento"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        documentUpdate = DocumentoSerializer(documentByID, data=request.data)
+        if documentUpdate.is_valid():
+            documentUpdate.save()
+            return Response(documentUpdate.data, status=status.HTTP_200_OK)
+        return Response(documentUpdate.errors, status=status.HTTP_400_BAD_REQUEST)
+        
