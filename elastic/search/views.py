@@ -101,7 +101,7 @@ class ModificarDocumento(APIView):
     """
     Funcion para eliminar un documento por su id, en la url se puede meter este valor
     """
-
+    parser_classes = [FormParser, MultiPartParser]
     def delete(self, request, id):
         try:
             documentByID = Biblioteca.objects.get(id=id)
@@ -128,4 +128,15 @@ class ModificarDocumento(APIView):
             documentUpdate.save()
             return Response(documentUpdate.data, status=status.HTTP_200_OK)
         return Response(documentUpdate.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, id):
+        try: 
+            documentByID = Biblioteca.objects.get(id=id)
+        except:
+            return Response(
+                {"message": "Error, no se encontro el documento"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        document = DocumentoSerializer(documentByID)
+        return Response(document.data, status=status.HTTP_200_OK)
+            
         
