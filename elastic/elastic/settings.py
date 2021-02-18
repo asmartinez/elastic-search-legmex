@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'search',
     'dispositions',
     'affair',
+    'applications.persona',
+    'applications.departamento',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'elastic.wsgi.application'
+AUTH_USER_MODEL = 'persona.User'
 
 
 # Database

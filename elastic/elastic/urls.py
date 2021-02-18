@@ -22,4 +22,5 @@ urlpatterns = [
     path('v1/', include('search.urls')), # URL para api
     url(r'^', include('affair.urls')),
     url(r'^', include('dispositions.urls')),
+    path('', include('applications.persona.urls')),
 ]

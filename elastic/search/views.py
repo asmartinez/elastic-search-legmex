@@ -28,12 +28,12 @@ def SubirDocumento(request):
     }
     """
     serializerUpload = DocumentoSerializer(
-        data=request.data
+        data = request.data
     )  # Serializar datos del request
     if serializerUpload.is_valid():  # Se valida la data
         serializerUpload.save()  # Se guardan los datos en db y elastic search
-        return Response(serializerUpload.data, status=status.HTTP_200_OK)
-    return Response(serializerUpload.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializerUpload.data, status = status.HTTP_200_OK)
+    return Response(serializerUpload.errors, status = status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -65,26 +65,24 @@ def BuscarDocumento(request):
             "legislationTranscriptCopy",
             "place",
             "dispositionNumber",
-            "dispositionTypeId",
-            "affairId",
         ]
 
     # Devuelve un error si no se manda ningun argumento
     else:
         return Response(
             {"message": "Error, no se mando ningun argumento de busqueda"},
-            status=status.HTTP_400_BAD_REQUEST,
+            status = status.HTTP_400_BAD_REQUEST,
         )
 
     # ------ Query de busqueda en elastic search y se guardan los resultados en response ---------
     searchQuery = BibliotecaDocument.search().query(
-        "multi_match", query=searchString, fields=fieldToSearch
+        "multi_match", query = searchString, fields = fieldToSearch
     )
     responseQuery = searchQuery.execute()
     # --------------------------------------------------------------------------------------------
 
     # Deserializacion de resultados de busqueda --------------------------------------------------
-    deSerializer = DocumentoSerializer(responseQuery.hits, many=True)
+    deSerializer = DocumentoSerializer(responseQuery.hits, many = True)
     # --------------------------------------------------------------------------------------------
 
     # ------ Por falla en deserializacion no manda el link del documento, ------------------------
@@ -94,7 +92,7 @@ def BuscarDocumento(request):
             "legislationTranscriptOriginal"
         ]
 
-    return Response(deSerializer.data, status=status.HTTP_200_OK)
+    return Response(deSerializer.data, status = status.HTTP_200_OK)
 
 
 class ModificarDocumento(APIView):
@@ -104,39 +102,47 @@ class ModificarDocumento(APIView):
     parser_classes = [FormParser, MultiPartParser]
     def delete(self, request, id):
         try:
-            documentByID = Biblioteca.objects.get(id=id)
+            documentByID = Biblioteca.objects.get(id = id)
         except:
             return Response(
                 {"message": "Error, no se encontro el documento"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status = status.HTTP_400_BAD_REQUEST,
             )
         documentByID.delete()
         return Response(
             {"message": "Se elimino correctamente el documento"},
-            status=status.HTTP_200_OK,
+            status = status.HTTP_200_OK,
         )
     def put(self, request, id):
         try:
-            documentByID = Biblioteca.objects.get(id=id)
+            documentByID = Biblioteca.objects.get(id = id)
         except:
             return Response(
                 {"message": "Error, no se encontro el documento"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status = status.HTTP_400_BAD_REQUEST,
             )
-        documentUpdate = DocumentoSerializer(documentByID, data=request.data)
+        documentUpdate = DocumentoSerializer(documentByID, data = request.data)
         if documentUpdate.is_valid():
             documentUpdate.save()
-            return Response(documentUpdate.data, status=status.HTTP_200_OK)
-        return Response(documentUpdate.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(documentUpdate.data, status = status.HTTP_200_OK)
+        return Response(documentUpdate.errors, status = status.HTTP_400_BAD_REQUEST)
     def get(self, request, id):
         try: 
-            documentByID = Biblioteca.objects.get(id=id)
+            documentByID = Biblioteca.objects.get(id = id)
         except:
             return Response(
                 {"message": "Error, no se encontro el documento"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status = status.HTTP_400_BAD_REQUEST,
             )
         document = DocumentoSerializer(documentByID)
-        return Response(document.data, status=status.HTTP_200_OK)
-            
+        return Response(document.data, status = status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def NumeroDocumentos(request):
+    """
+    Funcion para devolver el numero de documentos que hay para cada disposicion
+    """
+    pass
+
         
